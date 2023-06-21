@@ -81,11 +81,13 @@ repositories {
 
 dependencies {
     implementation group: 'org.apache.beam', name: 'beam-sdks-java-core', version: dataflowBeamVersion
-    implementation(group: 'org.apache.beam', name: 'beam-runners-google-cloud-dataflow-java', version: dataflowBeamVersion) {
-        exclude group: 'io.confluent', module: 'kafka-schema-registry-client'
-        exclude group: 'io.confluent', module: 'kafka-avro-serializer'
-    }
-    implementation group: 'org.apache.beam', name: 'beam-runners-direct-java', version: dataflowBeamVersion
+//    implementation(group: 'org.apache.beam', name: 'beam-runners-google-cloud-dataflow-java', version: dataflowBeamVersion) {
+//        exclude group: 'io.confluent', module: 'kafka-schema-registry-client'
+//        exclude group: 'io.confluent', module: 'kafka-avro-serializer'
+//    }
+//    implementation group: 'org.apache.beam', name: 'beam-runners-direct-java', version: dataflowBeamVersion
+    implementation group: 'org.apache.beam', name: 'beam-sdks-java-io-google-cloud-platform', version: dataflowBeamVersion
+    implementation group: 'org.apache.beam', name: 'beam-runners-flink-1.15', version: dataflowBeamVersion
     implementation group: 'org.apache.beam', name: 'beam-sdks-java-extensions-ml', version: dataflowBeamVersion
     implementation group: 'org.apache.beam', name: 'beam-sdks-java-io-amazon-web-services', version: dataflowBeamVersion
     implementation group: 'org.slf4j', name: 'slf4j-jdk14', version: '2.0.6'
