@@ -31,6 +31,7 @@ import com.google.swarm.tokenization.common.FilePollingTransform;
 import com.google.swarm.tokenization.common.MergeBigQueryRowToDlpRow;
 import com.google.swarm.tokenization.common.PubSubMessageConverts;
 import com.google.swarm.tokenization.common.Util;
+import com.google.swarm.tokenization.common.WriteToCSVObject;
 import com.google.swarm.tokenization.json.ConvertJsonRecordToDLPRow;
 import com.google.swarm.tokenization.json.JsonReaderSplitDoFn;
 import com.google.swarm.tokenization.txt.ConvertTxtToDLPRow;
@@ -42,13 +43,12 @@ import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
+import org.apache.beam.sdk.io.Compression;
 import org.apache.beam.sdk.io.FileIO.ReadableFile;
+import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.io.gcp.pubsub.PubsubIO;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.Flatten;
-import org.apache.beam.sdk.transforms.ParDo;
-import org.apache.beam.sdk.transforms.Sample;
-import org.apache.beam.sdk.transforms.View;
+import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.transforms.windowing.FixedWindows;
 import org.apache.beam.sdk.transforms.windowing.Window;
 import org.apache.beam.sdk.values.KV;
@@ -184,7 +184,8 @@ public class DLPTextToBigQueryStreamingV2 {
         throw new IllegalArgumentException("Please validate FileType parameter");
     }
 
-    records
+    PCollectionTuple RecordDeid;
+    RecordDeid = records
         .apply(
             "DLPTransform",
             DLPTransform.newBuilder()
@@ -198,15 +199,37 @@ public class DLPTextToBigQueryStreamingV2 {
                 .setJobName(options.getJobName())
                 .setDlpApiRetryCount(options.getDlpApiRetryCount())
                 .setInitialBackoff(options.getInitialBackoff())
-                .build())
-        .get(Util.inspectOrDeidSuccess)
+                .build());
+
+    RecordDeid.get(Util.inspectOrDeidSuccess)
         .apply(
             "StreamInsertToBQ",
             BigQueryDynamicWriteTransform.newBuilder()
                 .setDatasetId(options.getDataset())
                 .setProjectId(options.getProject())
                 .build());
+
+    RecordDeid.get(Util.deidCSVString).apply("WriteToCSV",
+            WriteToCSVObject.newBuilder()
+                .setOutputBucket(options.getOutputBucket())
+                .build());
+
+//    RecordDeid.get(Util.deidCSVString)
+//            .apply(GroupByKey.create())
+//            .apply(Window.into(FixedWindows.of(WINDOW_INTERVAL)))
+//            .apply(TextIO.<KV<String, Iterable<String>>>write()
+//                    .to(getDestinationObject(KV::getKey().toString(),options.getOutputBucket()))
+//            .withSuffix(".csv")
+//            .withCompression(Compression.GZIP)
+//    );
   }
+  private static String getDestinationObject(String filepath, String outputBucket){
+     String file = filepath.split("/")[-1];
+     return outputBucket.concat("/").concat(file);
+
+
+  }
+
 
   private static void runReidPipeline(
       Pipeline p, DLPTextToBigQueryStreamingV2PipelineOptions options) {

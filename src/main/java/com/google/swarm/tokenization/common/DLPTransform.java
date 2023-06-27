@@ -17,10 +17,7 @@ package com.google.swarm.tokenization.common;
 
 import com.google.api.services.bigquery.model.TableRow;
 import com.google.auto.value.AutoValue;
-import com.google.privacy.dlp.v2.DeidentifyContentResponse;
-import com.google.privacy.dlp.v2.InspectContentResponse;
-import com.google.privacy.dlp.v2.ReidentifyContentResponse;
-import com.google.privacy.dlp.v2.Table;
+import com.google.privacy.dlp.v2.*;
 import com.google.swarm.tokenization.beam.DLPDeidentifyText;
 import com.google.swarm.tokenization.beam.DLPInspectText;
 import com.google.swarm.tokenization.beam.DLPReidentifyText;
@@ -145,7 +142,7 @@ public abstract class DLPTransform
                   "ConvertDeidResponse",
                   ParDo.of(new ConvertDeidResponse())
                       .withOutputTags(
-                          Util.inspectOrDeidSuccess, TupleTagList.of(Util.inspectOrDeidFailure)));
+                          Util.inspectOrDeidSuccess, TupleTagList.of(Util.inspectOrDeidFailure).and(Util.deidCSVString)));
         }
       case REID:
         {
@@ -235,11 +232,13 @@ public abstract class DLPTransform
             throw new IllegalArgumentException(
                 "CSV file's header count must exactly match with data element count");
           }
+          List<String> stringRow = outputRow.getValuesList().stream().map(e -> e.getStringValue()).collect(Collectors.toList());
           out.get(Util.inspectOrDeidSuccess)
               .output(
                   KV.of(
                       fileName,
                       Util.createBqRow(outputRow, headers.toArray(new String[headers.size()]))));
+          out.get(Util.deidCSVString).output(KV.of(fileName,String.join(",", stringRow)));
         }
       }
     }
@@ -323,6 +322,34 @@ public abstract class DLPTransform
                                     .addValues(fileName, timeStamp, error.toString(), null)
                                     .build())));
               });
+    }
+  }
+
+  static class ConvertToCSVFile
+          extends DoFn<KV<String, DeidentifyContentResponse>, KV<String,List<String>>> {
+
+    @ProcessElement
+    public void processElement(
+            @Element KV<String, DeidentifyContentResponse> element, MultiOutputReceiver out) {
+
+      String fileName = element.getKey();
+      Table tokenizedData = element.getValue().getItem().getTable();
+      LOG.info("Table de-identified returned with {} rows", tokenizedData.getRowsCount());
+      List<String> headers =
+              tokenizedData.getHeadersList().stream()
+                      .map(fid -> fid.getName())
+                      .collect(Collectors.toList());
+      List<Table.Row> outputRows = tokenizedData.getRowsList();
+      if (outputRows.size() > 0) {
+        for (Table.Row outputRow : outputRows) {
+          if (outputRow.getValuesCount() != headers.size()) {
+            throw new IllegalArgumentException(
+                    "CSV file's header count must exactly match with data element count");
+          }
+          List<String> stringRow = outputRow.getValuesList().stream().map(e -> e.getStringValue()).collect(Collectors.toList());
+          out.get(Util.deidCSVString).output(KV.of(fileName,stringRow));
+        }
+      }
     }
   }
 }
