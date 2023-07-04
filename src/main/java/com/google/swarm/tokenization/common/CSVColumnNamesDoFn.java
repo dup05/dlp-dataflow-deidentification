@@ -49,6 +49,7 @@ public class CSVColumnNamesDoFn extends DoFn<KV<String, ReadableFile>, KV<String
               });
 
       String fileName = c.element().getKey();
+      LOG.info("Headers found: {}",columnNames.toString());
       c.output(KV.of(fileName, columnNames));
 
     } catch (IOException e) {

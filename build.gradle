@@ -7,12 +7,12 @@ plugins {
 
 ext {
     javaVersion = '11.0'
-    flinkVersion = '1.17.1'
+    flinkVersion = '1.16.2'
     scalaBinaryVersion = '2.12'
     slf4jVersion = '1.7.36'
     log4jVersion = '2.17.1'
     beamVersion = '2.47.0'
-    flinkVersionNew = flinkVersion.toString().replace("-SNAPSHOT", "") >= "1.17"
+    flinkVersionNew = flinkVersion.toString().replace("-SNAPSHOT", "") >= "1.16"
 }
 
 // artifact properties

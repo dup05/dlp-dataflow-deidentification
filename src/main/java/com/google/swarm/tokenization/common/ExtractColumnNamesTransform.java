@@ -30,12 +30,15 @@ import org.apache.beam.sdk.transforms.View;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
 @AutoValue
 public abstract class ExtractColumnNamesTransform
     extends PTransform<
         PCollection<KV<String, FileIO.ReadableFile>>, PCollectionView<Map<String, List<String>>>> {
+  public static final Logger LOG = LoggerFactory.getLogger(ExtractColumnNamesTransform.class);
 
   public abstract FileType fileType();
 
@@ -63,6 +66,7 @@ public abstract class ExtractColumnNamesTransform
     switch (fileType()) {
       case CSV:
         readHeader = input.apply("ReadHeader", ParDo.of(new CSVColumnNamesDoFn()));
+        LOG.info("Processed CSV headers");
         break;
 
       case AVRO:
@@ -80,6 +84,7 @@ public abstract class ExtractColumnNamesTransform
       default:
         throw new IllegalStateException("Unexpected value: " + fileType());
     }
+    LOG.info("Is there any issue here???");
     return readHeader.apply("ViewAsList", View.asMap());
   }
 }

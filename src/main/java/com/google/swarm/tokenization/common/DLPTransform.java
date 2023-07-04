@@ -128,6 +128,7 @@ public abstract class DLPTransform
 
       case DEID:
         {
+          LOG.info("Entering DLP Deid transform");
           return input
               .apply(
                   "DeIdTransform",

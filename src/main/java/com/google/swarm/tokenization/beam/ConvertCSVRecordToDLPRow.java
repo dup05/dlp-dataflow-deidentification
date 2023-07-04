@@ -55,6 +55,7 @@ public class ConvertCSVRecordToDLPRow extends DoFn<KV<String, String>, KV<String
     String fileName = context.element().getKey();
     Map<String, List<String>> headers = context.sideInput(header);
     List<String> csvHeader = headers.get(fileName);
+//    System.out.print("Headers map:" + csvHeader.toString());
     if (csvHeader == null) {
       throw new RuntimeException(
           "Unable to find header row for fileName: "
@@ -62,7 +63,7 @@ public class ConvertCSVRecordToDLPRow extends DoFn<KV<String, String>, KV<String
               + ". The side input only contains header for "
               + headers.keySet());
     }
-
+    LOG.info("In Convert to DLP Row Transform");
     if (columnDelimiter != null) {
 
       List<String> values = Util.parseLine(input, columnDelimiter, '"');

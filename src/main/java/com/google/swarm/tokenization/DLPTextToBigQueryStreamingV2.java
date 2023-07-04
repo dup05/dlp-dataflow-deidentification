@@ -64,7 +64,7 @@ import org.slf4j.LoggerFactory;
 public class DLPTextToBigQueryStreamingV2 {
 
   public static final Logger LOG = LoggerFactory.getLogger(DLPTextToBigQueryStreamingV2.class);
-  private static final Duration DEFAULT_POLL_INTERVAL = Duration.standardSeconds(3);
+  private static final Duration DEFAULT_POLL_INTERVAL = Duration.standardSeconds(10);
   private static final Duration WINDOW_INTERVAL = Duration.standardSeconds(3);
   /** PubSub configuration for default batch size in number of messages */
   public static final Integer PUB_SUB_BATCH_SIZE = 1000;
@@ -115,6 +115,7 @@ public class DLPTextToBigQueryStreamingV2 {
                 .setFileType(options.getFileType())
                 .setHeaders(options.getHeaders())
                 .build());
+//    System.out.println("Column names extracted...");
 
     PCollection<KV<String, Table.Row>> records;
 
