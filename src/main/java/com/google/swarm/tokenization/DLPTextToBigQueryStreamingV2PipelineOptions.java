@@ -19,19 +19,24 @@ import com.google.privacy.dlp.v2.LocationName;
 import com.google.swarm.tokenization.common.Util.DLPMethod;
 import com.google.swarm.tokenization.common.Util.FileType;
 import java.util.List;
-import org.apache.beam.runners.dataflow.options.DataflowPipelineOptions;
-import org.apache.beam.sdk.io.aws.options.S3Options;
+import org.apache.beam.runners.flink.FlinkPipelineOptions;
+import org.apache.beam.sdk.extensions.gcp.options.GcpOptions;
 import org.apache.beam.sdk.io.gcp.bigquery.BigQueryIO;
 import org.apache.beam.sdk.io.gcp.bigquery.BigQueryIO.TypedRead.Method;
 import org.apache.beam.sdk.options.*;
 
 public interface DLPTextToBigQueryStreamingV2PipelineOptions
-    extends DataflowPipelineOptions, S3Options {
+    extends FlinkPipelineOptions, GcpOptions {
 
   @Validation.Required
   String getFilePattern();
 
   void setFilePattern(String csvFilePattern);
+
+//  @Validation.Required
+//  String getProject();
+//
+//  void setProject(String project);
 
   @Description("DLP Inspect Template Name")
   String getInspectTemplateName();
