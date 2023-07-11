@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 public abstract class ExtractColumnNamesTransform
     extends PTransform<
         PCollection<KV<String, FileIO.ReadableFile>>, PCollectionView<Map<String, List<String>>>> {
-  public static final Logger LOG = LoggerFactory.getLogger(ExtractColumnNamesTransform.class);
+//  public static final Logger LOG = LoggerFactory.getLogger(ExtractColumnNamesTransform.class);
 
   public abstract FileType fileType();
 
@@ -66,7 +66,7 @@ public abstract class ExtractColumnNamesTransform
     switch (fileType()) {
       case CSV:
         readHeader = input.apply("ReadHeader", ParDo.of(new CSVColumnNamesDoFn()));
-        LOG.info("Processed CSV headers");
+//        LOG.info("Processed CSV headers");
         break;
 
       case AVRO:
@@ -84,7 +84,7 @@ public abstract class ExtractColumnNamesTransform
       default:
         throw new IllegalStateException("Unexpected value: " + fileType());
     }
-    LOG.info("Is there any issue here???");
+//    LOG.info("Is there any issue here???");
     return readHeader.apply("ViewAsList", View.asMap());
   }
 }
