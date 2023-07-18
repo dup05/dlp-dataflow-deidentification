@@ -140,10 +140,9 @@ public interface DLPTextToBigQueryStreamingV2PipelineOptions
    */
   void setInitialBackoff(int value);
 
-  @Description("Number of retries in case of transient errors in DLP API")
   String getOutputBucket();
 
-  String setOutputBucket(String value);
+  void setOutputBucket(String csvOutputBucket);
 
   class FileTypeFactory implements DefaultValueFactory<FileType> {
     @Override

@@ -1,26 +1,20 @@
 package com.google.swarm.tokenization.common;
 
 import com.google.auto.value.AutoValue;
-import com.google.swarm.tokenization.avro.GenericRecordCoder;
-import org.apache.beam.sdk.io.DefaultFilenamePolicy;
-import org.apache.beam.sdk.io.FileBasedSink;
+import org.apache.beam.sdk.coders.StringUtf8Coder;
+import org.apache.beam.sdk.io.*;
 import org.apache.beam.sdk.io.FileBasedSink.DynamicDestinations;
-import org.apache.beam.sdk.io.TextIO;
-import org.apache.beam.sdk.io.fs.ResolveOptions;
-import org.apache.beam.sdk.transforms.GroupByKey;
+import org.apache.beam.sdk.transforms.Contextful;
 import org.apache.beam.sdk.transforms.PTransform;
-import org.apache.beam.sdk.transforms.SerializableFunction;
-import org.apache.beam.sdk.transforms.windowing.Window;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.sdk.values.PDone;
 import org.checkerframework.checker.initialization.qual.Initialized;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.UnknownKeyFor;
 
 @AutoValue
 @SuppressWarnings("serial")
-public abstract class WriteToCSVObject extends PTransform<PCollection<KV<String, String>>, PDone> {
+public abstract class WriteToCSVObject extends PTransform<PCollection<KV<String, String>>, WriteFilesResult<String>> {
 
     public abstract String outputBucket();
 
@@ -36,17 +30,22 @@ public abstract class WriteToCSVObject extends PTransform<PCollection<KV<String,
     }
 
     @Override
-    public PDone expand(PCollection<KV<String, String>> input) {
-        return input.apply("WriteIO", TextIO.<KV<String, String>>writeCustomType()
-                .to(new GCSDestination("gs://temp"))
-                .withSuffix(".csv"));
+    public WriteFilesResult<String> expand(PCollection<KV<String, String>> input) {
+//        return input.apply("WriteIO", TextIO.<KV<String, String>>writeCustomType()
+//                .to(new GCSDestination("gs://temp"))
+//                .withSuffix(".csv"));
 //        TextIO.writeCustomType[Event].asInstanceOf[TextIO.TypedWrite[Event, String]]
 //    .to(new MyDynamicDestinations(baseDir))
 //                TextIO.<KV<String,String>>writeCustomType()
 //                        .to(new GCSDestination(outputBucket())));
-
+        return input.apply("Write to CSV", FileIO.<String, KV<String, String>>writeDynamic()
+                .by(KV::getKey)
+                .withDestinationCoder(StringUtf8Coder.of())
+                .via(Contextful.fn(KV::getValue), TextIO.sink())
+                .to(outputBucket())
+                .withNaming(key -> FileIO.Write.defaultNaming(key, ".csv"))
+                .withNumShards(1));
     }
-
     public class GCSDestination extends DynamicDestinations< KV<String,String>, String, String> {
 
         public String outputBucket;

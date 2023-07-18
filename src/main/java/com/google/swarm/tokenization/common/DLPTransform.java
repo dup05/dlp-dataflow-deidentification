@@ -325,31 +325,31 @@ public abstract class DLPTransform
     }
   }
 
-  static class ConvertToCSVFile
-          extends DoFn<KV<String, DeidentifyContentResponse>, KV<String,List<String>>> {
-
-    @ProcessElement
-    public void processElement(
-            @Element KV<String, DeidentifyContentResponse> element, MultiOutputReceiver out) {
-
-      String fileName = element.getKey();
-      Table tokenizedData = element.getValue().getItem().getTable();
-      LOG.info("Table de-identified returned with {} rows", tokenizedData.getRowsCount());
-      List<String> headers =
-              tokenizedData.getHeadersList().stream()
-                      .map(fid -> fid.getName())
-                      .collect(Collectors.toList());
-      List<Table.Row> outputRows = tokenizedData.getRowsList();
-      if (outputRows.size() > 0) {
-        for (Table.Row outputRow : outputRows) {
-          if (outputRow.getValuesCount() != headers.size()) {
-            throw new IllegalArgumentException(
-                    "CSV file's header count must exactly match with data element count");
-          }
-          List<String> stringRow = outputRow.getValuesList().stream().map(e -> e.getStringValue()).collect(Collectors.toList());
-          out.get(Util.deidCSVString).output(KV.of(fileName,stringRow));
-        }
-      }
-    }
-  }
+//  static class ConvertToCSVFile
+//          extends DoFn<KV<String, DeidentifyContentResponse>, KV<String,List<String>>> {
+//
+//    @ProcessElement
+//    public void processElement(
+//            @Element KV<String, DeidentifyContentResponse> element, MultiOutputReceiver out) {
+//
+//      String fileName = element.getKey();
+//      Table tokenizedData = element.getValue().getItem().getTable();
+//      LOG.info("Table de-identified returned with {} rows", tokenizedData.getRowsCount());
+//      List<String> headers =
+//              tokenizedData.getHeadersList().stream()
+//                      .map(fid -> fid.getName())
+//                      .collect(Collectors.toList());
+//      List<Table.Row> outputRows = tokenizedData.getRowsList();
+//      if (outputRows.size() > 0) {
+//        for (Table.Row outputRow : outputRows) {
+//          if (outputRow.getValuesCount() != headers.size()) {
+//            throw new IllegalArgumentException(
+//                    "CSV file's header count must exactly match with data element count");
+//          }
+//          List<String> stringRow = outputRow.getValuesList().stream().map(e -> e.getStringValue()).collect(Collectors.toList());
+//          out.get(Util.deidCSVString).output(KV.of(fileName,stringRow));
+//        }
+//      }
+//    }
+//  }
 }
