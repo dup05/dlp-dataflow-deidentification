@@ -19,6 +19,7 @@ import org.checkerframework.checker.initialization.qual.Initialized;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.UnknownKeyFor;
 
+import javax.annotation.Nullable;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +34,9 @@ public abstract class WriteToGCS extends PTransform<PCollection<KV<String, Table
 
     public abstract Character columnDelimiter();
 
+    @Nullable
+    public abstract List<String> headers();
+
     public static Builder newBuilder() {
         return new AutoValue_WriteToGCS.Builder();
     }
@@ -45,17 +49,23 @@ public abstract class WriteToGCS extends PTransform<PCollection<KV<String, Table
 
         public abstract Builder setColumnDelimiter(Character columnDelimiter);
 
+        public abstract Builder setHeaders(List<String> headers);
+
         public abstract WriteToGCS build();
     }
 
     @Override
     public WriteFilesResult<String> expand(PCollection<KV<String, Table.Row>> input) {
-
+        TextIO.Sink sink;
+        if(headers()!= null)
+            sink = TextIO.sink().withHeader(String.join(columnDelimiter().toString(),headers()));
+        else
+            sink = TextIO.sink();
         return input.apply("ConvertTableRowToString",ParDo.of(new ConvertTableRowToString(fileType(),columnDelimiter())))
                 .apply("WriteFileToGCS", FileIO.<String, KV<String, String>>writeDynamic()
                     .by(KV::getKey)
                     .withDestinationCoder(StringUtf8Coder.of())
-                    .via(Contextful.fn(KV::getValue), TextIO.sink())
+                    .via(Contextful.fn(KV::getValue),sink)
                     .to(outputBucket())
                     .withNaming(key -> new CsvFileNaming(key, ".csv"))
                     .withNumShards(1));

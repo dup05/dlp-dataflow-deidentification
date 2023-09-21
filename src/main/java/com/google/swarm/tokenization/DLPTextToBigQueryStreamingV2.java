@@ -242,6 +242,7 @@ public class DLPTextToBigQueryStreamingV2 {
                       .setOutputBucket(options.getOutputBucket())
                       .setFileType(options.getFileType())
                       .setColumnDelimiter(options.getColumnDelimiter())
+                      .setHeaders(options.getHeaders())
                       .build());
     else if(options.getDataSinkType() == Util.DataSinkType.BigQuery)
       inspectDeidRecords.get(Util.inspectOrDeidSuccess)
