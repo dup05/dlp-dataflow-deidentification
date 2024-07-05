@@ -1,0 +1,50 @@
+[
+  {
+    "name": "test_1",
+    "type": "batch",
+    "file_type": "CSV",
+    "file_size": "500MB",
+    "gcs_file_path": "gs://dlp_dataflow_load_testing/testCsv2500K.csv",
+    "deid_template": "projects/dlp-dataflow-load-test/deidentifyTemplates/dlp-demo-deid-latest-1706594483019"
+  },
+  {
+    "name": "test_2",
+    "type": "batch",
+    "file_type": "CSV",
+    "file_size": "1GB",
+    "gcs_file_path": "gs://dlp_dataflow_load_testing/testCsv5000K.csv",
+    "deid_template": "projects/dlp-dataflow-load-test/deidentifyTemplates/dlp-demo-deid-latest-1706594483019"
+  },
+  {
+    "name": "test_3",
+    "type": "batch",
+    "file_type": "CSV",
+    "file_size": "2GB",
+    "gcs_file_path": "gs://dlp_dataflow_load_testing/testCsv10000K.csv",
+    "deid_template": "projects/dlp-dataflow-load-test/deidentifyTemplates/dlp-demo-deid-latest-1706594483019"
+  },
+  {
+    "name": "test_4",
+    "type": "batch",
+    "file_type": "CSV",
+    "file_size": "3GB",
+    "gcs_file_path": "gs://dlp_dataflow_load_testing/testCsv15000K.csv",
+    "deid_template": "projects/dlp-dataflow-load-test/deidentifyTemplates/dlp-demo-deid-latest-1706594483019"
+  },
+  {
+    "name": "test_5",
+    "type": "batch",
+    "file_type": "CSV",
+    "file_size": "4GB",
+    "gcs_file_path": "gs://dlp_dataflow_load_testing/testCsv20000K.csv",
+    "deid_template": "projects/dlp-dataflow-load-test/deidentifyTemplates/dlp-demo-deid-latest-1706594483019"
+  },
+  {
+    "name": "test_6",
+    "type": "batch",
+    "file_type": "CSV",
+    "file_size": "6GB",
+    "gcs_file_path": "gs://dlp_dataflow_load_testing/testCsv40000K.csv",
+    "deid_template": "projects/dlp-dataflow-load-test/deidentifyTemplates/dlp-demo-deid-latest-1706594483019"
+  }
+]
