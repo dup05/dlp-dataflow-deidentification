@@ -46,7 +46,7 @@ jobs:
       - name: Read test details
         id: set-matrix
         run: |
-          matrix=$(jq -c . < .github/workflows/configs/tests_config.json)
+          matrix=$(jq -c . < .github/workflows/configs/load_test_config.json)
           if [[ "${{github.event.inputs.test_config_json}}" != "" ]]; then 
             matrix=$(echo '${{github.event.inputs.test_config_json}}'  | jq .)
           fi
