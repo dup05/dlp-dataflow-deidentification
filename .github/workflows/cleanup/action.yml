@@ -20,9 +20,9 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Cleanup BQ Tables
-      shell: bash
-      run: bq rm -r -f -d ${{inputs.project_id}}:${{inputs.dataset}}
+    # - name: Cleanup BQ Tables
+    #   shell: bash
+    #   run: bq rm -r -f -d ${{inputs.project_id}}:${{inputs.dataset}}
 
     - name: Cleanup GCS files
       if: always() && inputs.job_type == 'streaming'
