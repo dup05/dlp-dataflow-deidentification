@@ -19,6 +19,9 @@ inputs:
   deid_template:
     description: "Deid template id"
     required: true
+  worker_machine_type:
+    description: "Worker Type"
+    default: "n1-highmem-8"
   job_name:
     description: "Dataflow job name"
     required: true
@@ -69,7 +72,7 @@ runs:
                   --runner=DataflowRunner \
                   --filePattern=${{inputs.gcs_file_path}}  \
                   --dataset=${{inputs.dataset}} \
-                  --workerMachineType=n1-highmem-8 \
+                  --workerMachineType=${{inputs.worker_machine_type}} \
                   --inspectTemplateName=${{inputs.inspect_template}} \
                   --deidentifyTemplateName=${{inputs.deid_template}} \
                   --batchSize=200000 \
@@ -91,7 +94,7 @@ runs:
               --runner=DataflowRunner \
               --filePattern=${{inputs.gcs_file_path}}  \
               --dataset=${{inputs.dataset}} \
-              --workerMachineType=n1-highmem-8 \
+              --workerMachineType=${{inputs.worker_machine_type}} \
               --inspectTemplateName=${{inputs.inspect_template}} \
               --deidentifyTemplateName=${{inputs.deid_template}} \
               --batchSize=200000 \

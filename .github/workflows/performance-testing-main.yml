@@ -88,6 +88,7 @@ jobs:
           dataset: ${{ steps.set-job-params.outputs.dataset }}
           inspect_template: ${{env.INSPECT_TEMPLATE}}
           deid_template: ${{ matrix.deid_template }}
+          worker_machine_type: ${{ matrix.worker_machine_type }}
           job_name: ${{steps.set-job-params.outputs.job_name}}
           job_type: ${{ matrix.type }}
           gcs_notification_topic: ${{env.PUB_SUB_TOPIC}}
